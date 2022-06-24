@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'myapp',
 ]
 
 # allauth
@@ -82,7 +83,10 @@ ROOT_URLCONF = 'edumee.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR / 'templates'),
+            os.path.join(BASE_DIR, 'templates', 'allauth'), #here
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,6 +122,8 @@ DATABASES = {
         'PORT' : '3306', 
         }
 }
+
+AUTH_USER_MODEL = 'myapp.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
