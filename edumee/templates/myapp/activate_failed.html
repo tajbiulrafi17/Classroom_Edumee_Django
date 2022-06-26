@@ -1,0 +1,17 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<body>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    {% for message in messages %}
+                
+            swal("",'{{ message }}',"error");
+        
+    {% endfor %}
+</script>
+
+</body>
+</html>

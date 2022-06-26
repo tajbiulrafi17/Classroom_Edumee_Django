@@ -1,3 +1,6 @@
+from audioop import reverse
+from curses.ascii import US
+import threading
 from django.shortcuts import render, redirect
 from django.views import View
 from .models import Student, Teacher, User
@@ -6,12 +9,68 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.utils.decorators import method_decorator
-
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes,force_str, DjangoUnicodeDecodeError
+from .utils import generate_token
+from django.core.mail import EmailMessage
+from django.conf import settings 
 
 # Create your views here.
-
 def index(request):
     return render(request, 'myapp/index.html')
+
+class EmailThread(threading.Thread):
+
+    def __init__(self,email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send( )
+        
+        
+
+def send_activation_email(user, request):
+    current_site = get_current_site(request)
+    email_subject = 'Activate your account'
+    email_body = render_to_string('myapp/activate_email.html',{
+        'user':user,
+        'domain':request.get_host(),
+        'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+        'token':generate_token.make_token(user)
+    })
+
+    email = EmailMessage(subject=email_subject, body=email_body, 
+                    from_email=settings.EMAIL_HOST_USER,
+                    to=[user.email]
+                    )
+    EmailThread(email).start()
+
+
+
+def activate_user(request, uidb64, token):
+
+    try:
+        uid=force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        
+    except Exception as e:
+        user = None
+    
+    if user and generate_token.check_token(user, token):
+        user.is_email_verified = True
+        user.save()
+        messages.add_message(request, messages.SUCCESS, 
+                            'Email verified, you can login now.')
+        return redirect('index')
+
+    messages.add_message(request, messages.SUCCESS, 
+                            'Link Expired!')
+    return render(request, 'myapp/activate_failed.html', {"user":user})
+
+      
 
 
 #Register View
@@ -45,12 +104,15 @@ class TeacherRegister(View):
                 'email':email,
                 'password':make_password(password1)
             }
+            
             user = User(**auth_info)
+            
             user.is_teacher = True
             user.save()
         user_obj = Teacher(user=user, name=name)
         user_obj.save()
-        messages.success(request, 'Thanks for Signup ! Please Login')
+        send_activation_email(user, request)
+        messages.success(request, 'Thanks for Signup ! Activate your account from your gmail.')
         return redirect ('teacher_login')
 
 
@@ -65,6 +127,7 @@ class StudentRegister(View):
             
         }
         return render(request,'myapp/s_register.html',context)
+
     def post(self,request,*args,**kwargs):
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -86,12 +149,15 @@ class StudentRegister(View):
                 'email':email,
                 'password':make_password(password1)
             }
+            
             user = User(**auth_info)
+            
             user.is_student = True
             user.save()
-        user_obj = Student(user=user, name=name, photo=photo)
-        user_obj.save()
-        messages.success(request,'Thanks for Signup! Please Login')
+            user_obj = Student(user=user, name=name, photo=photo)
+            user_obj.save()
+        send_activation_email(user, request)
+        messages.success(request,'Thanks for Signup! Activate your account from your gmail.')
         return redirect ('student_login')
     
 
@@ -109,18 +175,22 @@ class TeacherLogin(View):
         user = authenticate(request, username = email, password=password)
 
         email_check = User.objects.filter(email = email)
-        
+
         if not email_check :
                 messages.warning(request, 'User Not found. Please Signup!!')
                 return redirect('teacher_login')
-        
+
         elif user is not None :
             check_teacher = User.objects.get(email = user)
+
+            if check_teacher.is_email_verified == False:
+                messages.warning(request, 'Email not verified. Please check email inbox')
+                return redirect('teacher_login')
 
             if check_teacher.is_teacher == True:
                 login(request, user)
                 return redirect('t_dash')
-            
+
             elif check_teacher.is_student == False:
                 messages.warning(request, 'You are an Admin. Login from Admin Panel!')
                 return redirect('teacher_login')
@@ -130,7 +200,6 @@ class TeacherLogin(View):
         else:
             messages.warning(request, 'Wrong Password!!')
             return redirect('teacher_login')
-
 
 
 class StudentLogin(View):
@@ -150,11 +219,16 @@ class StudentLogin(View):
                 return redirect('student_login')
        
         elif user is not None:           
-            check_teacher = User.objects.get(email = user)
-            if check_teacher.is_student == True:
+            check_student = User.objects.get(email = user)
+
+            if check_student.is_email_verified == False:
+                messages.warning(request, 'Email not verified. Please check email inbox')
+                return redirect('student_login')
+
+            if check_student.is_student == True:
                 login(request, user)
                 return redirect('s_dash')
-            elif check_teacher.is_teacher == False:
+            elif check_student.is_teacher == False:
                 messages.warning(request, 'You are an Admin. Login from Admin Panel!')
                 return redirect('student_login')
             else:

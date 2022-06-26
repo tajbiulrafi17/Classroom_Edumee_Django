@@ -48,6 +48,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_student = models.BooleanField(default=False)
     is_teacher = models.BooleanField(default=False)
 
+    is_email_verified = models.BooleanField(default=False)
+
     def __self__(self):
         return self.email
 
