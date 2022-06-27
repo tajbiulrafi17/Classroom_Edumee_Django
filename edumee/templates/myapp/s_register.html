@@ -11,8 +11,16 @@
 
         <h2 class="text-center">Student Signup</h2>
         <br>
-
-        <div class="messages" >
+        <script>
+            {% for message in messages %}
+                        
+                    swal("",'{{ message }}',"warning");
+                
+            {% endfor %}
+        </script>
+    
+        <!-- Alternate message view -->
+        <!-- <div class="messages" >
             {% for message in messages %}
                 <div class="alert alert-primary" {% if message.tags %}
                     class="{{ message.tags }}"{% endif %}>{{ message }}
@@ -21,9 +29,7 @@
                     </button>
                 </div>
             {% endfor %}
-        </div>
-
-
+        </div> -->
 
     <form action="{% url 'student_register' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}

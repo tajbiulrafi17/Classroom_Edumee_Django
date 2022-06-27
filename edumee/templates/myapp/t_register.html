@@ -13,8 +13,16 @@
 
         <h2 class="text-center">Teacher Signup</h2>
         <br>
-
-        <div class="messages" >
+        <script>
+            {% for message in messages %}
+                        
+                    swal("",'{{ message }}',"warning");
+                
+            {% endfor %}
+        </script>
+    
+        <!-- Alternate message view -->
+        <!-- <div class="messages" >
             {% for message in messages %}
                 <div class="alert alert-primary" {% if message.tags %}
                     class="{{ message.tags }}"{% endif %}>{{ message }}
@@ -23,7 +31,7 @@
                     </button>
                 </div>
             {% endfor %}
-        </div>
+        </div> -->
 
 
 

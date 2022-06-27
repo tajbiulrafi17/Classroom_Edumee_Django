@@ -1,6 +1,7 @@
 from audioop import reverse
 from curses.ascii import US
 import threading
+from django import views
 from django.shortcuts import render, redirect
 from django.views import View
 from .models import Student, Teacher, User
@@ -16,6 +17,8 @@ from django.utils.encoding import force_bytes,force_str, DjangoUnicodeDecodeErro
 from .utils import generate_token
 from django.core.mail import EmailMessage
 from django.conf import settings 
+import json
+from django.http import JsonResponse
 
 # Create your views here.
 def index(request):
@@ -71,6 +74,18 @@ def activate_user(request, uidb64, token):
     return render(request, 'myapp/activate_failed.html', {"user":user})
 
       
+#
+class EmailValidationView(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        email = data['email']
+
+        # if not str(email).isalnum():
+        #     return JsonResponse({'email_error':'USername should only contain alphaneumeric character'}, status=400)
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'email_error':'Email already used! Try another one or Login.'}, status=400)
+        return JsonResponse({'email_valid': True})
+
 
 
 #Register View
@@ -82,7 +97,7 @@ class TeacherRegister(View):
         context ={
 
         }
-        return render(reqeust,'myapp/t_register.html',context)
+        return render(reqeust,'myapp/t_register_ajax.html',context)
     
     def post(self,request,*args,**kwargs):
         name = request.POST.get('name')
@@ -126,7 +141,7 @@ class StudentRegister(View):
         context ={
             
         }
-        return render(request,'myapp/s_register.html',context)
+        return render(request,'myapp/s_register_ajax.html',context)
 
     def post(self,request,*args,**kwargs):
         name = request.POST.get('name')
