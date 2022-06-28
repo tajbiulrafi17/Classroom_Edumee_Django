@@ -13,7 +13,6 @@ emailField.addEventListener("keyup", (e) =>{
             body:JSON.stringify({'email': emailVal}),
             method: "POST",
         }).then(res=>res.json()).then(data=>{
-            console.log("data", data);
             if(data.email_error){
                 emailField.classList.add('is-invalid');
                 feedbackArea.style.display = "block";

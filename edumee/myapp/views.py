@@ -24,6 +24,11 @@ from django.http import JsonResponse
 def index(request):
     return render(request, 'myapp/index.html')
 
+def indexV2(request):
+    return render(request, 'myapp/index_v2.html')
+
+
+# Email verification functions and Email Thread
 class EmailThread(threading.Thread):
 
     def __init__(self,email):
@@ -128,7 +133,7 @@ class TeacherRegister(View):
         user_obj.save()
         send_activation_email(user, request)
         messages.success(request, 'Thanks for Signup ! Activate your account from your gmail.')
-        return redirect ('teacher_login')
+        return redirect ('index')
 
 
 
@@ -173,7 +178,7 @@ class StudentRegister(View):
             user_obj.save()
         send_activation_email(user, request)
         messages.success(request,'Thanks for Signup! Activate your account from your gmail.')
-        return redirect ('student_login')
+        return redirect ('index')
     
 
 #Login View
@@ -193,14 +198,14 @@ class TeacherLogin(View):
 
         if not email_check :
                 messages.warning(request, 'User Not found. Please Signup!!')
-                return redirect('teacher_login')
+                return redirect('teacher_register')
 
         elif user is not None :
             check_teacher = User.objects.get(email = user)
 
             if check_teacher.is_email_verified == False:
                 messages.warning(request, 'Email not verified. Please check email inbox')
-                return redirect('teacher_login')
+                return redirect('index')
 
             if check_teacher.is_teacher == True:
                 login(request, user)
@@ -208,13 +213,13 @@ class TeacherLogin(View):
 
             elif check_teacher.is_student == False:
                 messages.warning(request, 'You are an Admin. Login from Admin Panel!')
-                return redirect('teacher_login')
+                return redirect('index')
             else:
                 messages.warning(request, 'You are not a Teacher. Please Login as a Student!')
-                return redirect('teacher_login')
+                return redirect('index')
         else:
             messages.warning(request, 'Wrong Password!!')
-            return redirect('teacher_login')
+            return redirect('index')
 
 
 class StudentLogin(View):
@@ -231,27 +236,27 @@ class StudentLogin(View):
         
         if not email_check:
                 messages.warning(request, 'User Not found. Please Signup!!')
-                return redirect('student_login')
+                return redirect('student_register')
        
         elif user is not None:           
             check_student = User.objects.get(email = user)
 
             if check_student.is_email_verified == False:
                 messages.warning(request, 'Email not verified. Please check email inbox')
-                return redirect('student_login')
+                return redirect('index')
 
             if check_student.is_student == True:
                 login(request, user)
                 return redirect('s_dash')
             elif check_student.is_teacher == False:
                 messages.warning(request, 'You are an Admin. Login from Admin Panel!')
-                return redirect('student_login')
+                return redirect('index')
             else:
                 messages.warning(request, 'You are not a Student. Please Login as a Teacher!')
-                return redirect('student_login')
+                return redirect('index')
         else:
             messages.warning(request, 'Wrong Password!!')
-            return redirect('student_login')
+            return redirect('index')
 
 #Logout View 
 class LogoutView(View):
