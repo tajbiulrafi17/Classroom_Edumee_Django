@@ -2,44 +2,12 @@
 
 {% load static %}
 
-{% block title %} {{ user.students.name }} | Scholarly {% endblock %}
+{% block title %} {{ user.students.name }} | Edumee {% endblock %}
 {% block css %}
-.s_box{
-    
-    position: relative;
-    box-shadow: 2px 1px 10px 1px #e6e6e6;
-    border-radius: 10px;
-    background: #8eccff;
-    overflow:hidden;
-    padding:30px;
-}
-.s_box img{
-    position:absolute;
-    top:40%;
-    right:20px;
-    width:20%;
-    height:auto;
-}
+
 {% endblock %}
 
 {% block content %} 
-
-{% comment %} 
-
-<div class="row" style="margin-top:30px; margin:0;">
-
-    <div class="messages" style="position: absolute; top:12%; left:70%; z-index: 1;" >
-        {% for message in messages %}
-            <div class="alert alert-primary" {% if message.tags %}
-                class="{{ message.tags }}"{% endif %}>{{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-    
-        {% endfor %}
-    </div> 
-{% endcomment %}
 
 <script>
 {% for message in messages %}
@@ -50,21 +18,7 @@
 </script>
 
 
-<h4 align="center" style="margin-top:30px">Classes</h4>
-<div class="row" style="margin-top:20px; margin:0; padding-top:20px;">
-    
-    {% for r in room %}
-    <div class="col-md-3 s_box m-4 ">
-        
-            <h4>{{ r.name }}</h4>
-            <img src="https://www.pngarts.com/files/11/Avatar-PNG-Transparent-Image.png" alt="">
-            <span>{{ r.details }}</span><br>
-             <span>{{ r.teacher }}</span><br>
-            <a href="{% url 'view_class' r.id %}"> view Class </a>
-    </div>
-    {% endfor %}
-    
+<h4 align="center" style="margin-top:30px">Student Dashboard</h4>
 
-</div>
 
 {% endblock %}

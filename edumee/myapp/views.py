@@ -151,7 +151,6 @@ class StudentRegister(View):
     def post(self,request,*args,**kwargs):
         name = request.POST.get('name')
         email = request.POST.get('email')
-        photo = request.FILES.get('image')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
         mail_check = User.objects.filter(email=email)
@@ -174,7 +173,7 @@ class StudentRegister(View):
             
             user.is_student = True
             user.save()
-            user_obj = Student(user=user, name=name, photo=photo)
+            user_obj = Student(user=user, name=name)
             user_obj.save()
         send_activation_email(user, request)
         messages.success(request,'Thanks for Signup! Activate your account from your gmail.')
@@ -186,7 +185,7 @@ class TeacherLogin(View):
     def get(self, request, *args, **kwargs):
         # if request.user.is_authenticated:
         #     return redirect('')
-        return render(request, 'myapp/t_login.html')
+        return render(request, 'myapp/index_v2.html')
     
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
@@ -226,7 +225,7 @@ class StudentLogin(View):
     def get(self, request, *args, **kwargs):
         # if request.user.is_authenticated:
         #     return redirect('')
-        return render(request, 'myapp/s_login.html')
+        return render(request, 'myapp/index_v2.html')
     
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
@@ -260,7 +259,7 @@ class StudentLogin(View):
 
 #Logout View 
 class LogoutView(View):
-    @method_decorator(login_required(login_url='login'))
+    @method_decorator(login_required(login_url='index'))
     def dispatch(self,request,*args,**kwargs):
         return super().dispatch(request,*args,**kwargs)
 

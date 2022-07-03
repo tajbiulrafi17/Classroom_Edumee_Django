@@ -7,12 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
     <link rel="stylesheet" href="{% static 'styles/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles/style_navbar.css' %}" />
+
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+	
     
     <title>{% block title %} {% endblock %}</title>
     <style>{% block css %} {% endblock %}</style>
@@ -21,7 +28,7 @@
 
 <body>
 
-{% include 'myapp/base/header.html' %}
+{% include 'myapp/base/navbar.html' %}
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
@@ -42,8 +49,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
-<script src="{% static 'scripts/main.js' %}"></script></body>
-<script src="{% static 'scripts/app.js' %}"></script></body>
+<script src="{% static 'scripts/main.js' %}"></script>
+<script src="{% static 'scripts/app.js' %}"></script>
 
 </body>
 </html>
