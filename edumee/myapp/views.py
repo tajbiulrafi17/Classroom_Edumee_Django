@@ -276,7 +276,10 @@ class TeacherDashboard(View):
         return super().dispatch(request,*args,**kwargs)
     def get(self,request):
         user = request.user.teachers
-        return render(request,'myapp/t_dashboard.html')
+        context = {
+            'room':user.room.all().order_by('-id')
+        }
+        return render(request,'myapp/t_dashboard.html', context)
 
 class StudentDashboard(View):
     @method_decorator(login_required(login_url='student_login'))

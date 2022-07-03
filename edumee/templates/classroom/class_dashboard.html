@@ -1,0 +1,30 @@
+{% extends 'myapp/base/base.html' %}
+
+{% block title %} {{room.name}} {% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+
+<script>
+{% for message in messages %}
+        
+    swal('{{ message }}');
+
+{% endfor %}
+
+</script>
+
+<h4 align="center" style="margin-top:30px">Class Dashboard</h4>
+    <div class="row  mt-3 ">
+            <div class="col-10 main_box" style="margin:0 auto;" >
+                    <h2 style="color:white;">{{ room.name }}</h2>
+                    <p>{{ room.details }}</p>
+                    <h6> Teacher: {{ room.teacher.name }}</h6>
+                    <h5 >Code : {{ room.code }}</h5>
+            </div>
+    </div>
+
+{% endblock %}
