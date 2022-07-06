@@ -22,8 +22,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, null=True, unique=True)),
                 ('code', models.CharField(blank=True, max_length=8, null=True)),
                 ('details', models.TextField(max_length=100)),
-                ('student', models.ManyToManyField(related_name='s_room', to='myapp.student')),
-                ('teacher', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='room', to='myapp.teacher')),
+                
             ],
             options={
                 'abstract': False,
@@ -37,5 +36,15 @@ class Migration(migrations.Migration):
                 ('room', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='classroom.classroom')),
                 ('student', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='myapp.student')),
             ],
+        ),
+        migrations.AddField(
+            model_name='classroom',
+            name='student',
+            field=models.ManyToManyField(related_name='s_room', through='classroom.Membership', to='myapp.student'),
+        ),
+        migrations.AddField(
+            model_name='classroom',
+            name='teacher',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='room', to='myapp.teacher'),
         ),
     ]

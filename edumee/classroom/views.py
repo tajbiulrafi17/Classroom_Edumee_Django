@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from .models import Classroom, Membership
 from django.contrib import messages
+from django.contrib.auth import authenticate
 
 # Create your views here.
 
@@ -67,3 +68,25 @@ class JoinClass(View):
         except:
             messages.warning(request, "No class found! Check Class code and try again.")
             return redirect('s_dash')
+
+
+class LeaveClass(View):
+    @method_decorator(login_required(login_url='student_login'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, id):
+        password = request.POST.get('password')
+        email = request.user.email
+        check = authenticate(request, username=email, password=password)
+
+        if check:
+            user = request.user.students
+            room = get_object_or_404(Classroom, id=id)
+            membership = Membership.objects.filter(student=user, room=room)
+            membership.delete()
+            messages.warning(request, 'You left the Classroom')
+            return redirect('s_dash')
+        else:
+            messages.warning(request, 'Verification failed! Could not leave.')
+            return redirect('view_class', id=id)
