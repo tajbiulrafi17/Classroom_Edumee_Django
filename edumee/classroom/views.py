@@ -90,3 +90,22 @@ class LeaveClass(View):
         else:
             messages.warning(request, 'Verification failed! Could not leave.')
             return redirect('view_class', id=id)
+
+
+class DeleteClass(View):
+    @method_decorator(login_required(login_url='teacher_login'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, id):
+        password = request.POST.get('password')
+        email = request.user.email
+        check = authenticate(request, username=email, password=password)
+        if check:
+            room = get_object_or_404(Classroom, id=id)
+            room.delete()
+            messages.warning(request, 'You deleted the Classroom')
+            return redirect('t_dash')
+        else:
+            messages.warning(request, 'Verification failed! Could not delete.')
+            return redirect('view_class', id=id)
