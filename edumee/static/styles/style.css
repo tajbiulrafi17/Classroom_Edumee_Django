@@ -157,6 +157,20 @@ form.sign-in-form {
   border-color: #4481eb;
 }
 
+.btn2 {
+  width: 100px;
+  border: none;
+  outline: none;
+  height: 40px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-weight: 200;
+  margin: 5px 0;
+  cursor: pointer;
+  transition: 0.5s;
+  
+}
+
 .btn {
   width: 150px;
   background-color: #5995fd;

@@ -1,10 +1,11 @@
 import imp
+from json import load
 from operator import methodcaller
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from .models import Classroom
+from .models import Classroom, Membership
 from django.contrib import messages
 
 # Create your views here.
@@ -38,3 +39,31 @@ class CreateClass(View):
         room.save()
         messages.success(request, 'Classroom has been Created !!')
         return redirect('class_dash', id=room.id)
+
+class JoinClass(View):
+    @method_decorator(login_required(login_url='student_join'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        code = request.POST.get('code')
+        try:
+            check_code = Classroom.objects.get(code= code)
+            user = request.user.students
+            classroom = Classroom(id = check_code.id)
+            check = Membership.objects.filter(room=classroom, student=user)
+            if check:
+                messages.success(request,'You are Already a member')
+                return redirect('s_dash') 
+            else:
+                member = Membership(room=classroom, student = user)
+                member.is_join = True
+                member.save()
+                messages.success(request,'Welcome to The Class!')
+                return redirect('class_dash', id=check_code.id)
+
+
+
+        except:
+            messages.warning(request, "No class found! Check Class code and try again.")
+            return redirect('s_dash')
