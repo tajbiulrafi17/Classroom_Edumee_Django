@@ -9,4 +9,6 @@ urlpatterns =[
     path('join_class/', views.JoinClass.as_view(), name='join_class'),
     path('leave_class/<int:id>', views.LeaveClass.as_view(), name='leave_class'),
     path('delete_class/<int:id>/', views.DeleteClass.as_view(), name="delete_class"),
+    path('invite_class/<int:id>', views.InviteClass.as_view(), name="invite_class")
+
 ]

@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Classroom, Membership
 from django.contrib import messages
 from django.contrib.auth import authenticate
+from django.conf import settings
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -109,3 +111,24 @@ class DeleteClass(View):
         else:
             messages.warning(request, 'Verification failed! Could not delete.')
             return redirect('view_class', id=id)
+
+
+class InviteClass(View):
+    @method_decorator(login_required(login_url='teacher_login'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, id):
+        try: 
+            room = get_object_or_404(Classroom, id=id)
+            send_to = request.POST.get('email')
+            subject = 'Edumee Classroom Invitation'
+            message = f'Hi Student, Greetings!!\nPlease join into class {room.name}, using class code: {room.code}.\nYour Teacher: {room.teacher}\n\nThank you,\nEdumee.'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [send_to]
+            send_mail(subject, message, email_from, recipient_list)
+            messages.success(request, 'Invitation successful!')
+            return redirect('class_dash', id=id)
+        except:
+            messages.warning(request, 'Something wrong! Invitation failed!')
+            return redirect('class_dash', id=id)
