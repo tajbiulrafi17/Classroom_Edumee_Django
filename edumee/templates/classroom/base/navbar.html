@@ -1,0 +1,108 @@
+
+
+<div class="wrapper">
+	<div class="navbar">
+		<div class="logo">
+			
+            
+            {% if user.is_teacher %}
+                <a href="{% url 't_dash' %}">Edumee</a>
+            {% else %}
+                <a href="{% url 's_dash' %}">Edumee</a>
+            {% endif %}
+
+        
+		</div>
+
+        <div class="nav_middle">
+            
+                <a class="nav-item nav-link active" href="{% url 'class_dash' room.id %}">Stream<span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" href="#">Files</a>
+                <a class="nav-item nav-link" href="#">People</a>
+                
+        
+        </div>
+		<div class="nav_right">
+			<ul>
+                <li class="nr_li dd_main1">
+					<i class="fas fa-bars"></i>
+                    <div class="dd_menu1">
+                      <div class="dd_right">
+                        <ul>
+                            {% if user.is_teacher %}
+                                <li><a class="dropdown-item" href="#" data-toggle="modal" data-target="#inviteClass">Invite Students</a></li>
+                                <li><a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteClass">Delete Class</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="#"  data-toggle="modal" data-target="#leaveClass">Leave Class</a></li>
+                            {% endif %}
+                        </ul>
+                      </div>
+                    </div>
+				</li>
+				<li class="nr_li dd_main">
+                    {% if user.is_teacher %}
+                    <img src="{{ user.teachers.photo.url }}" alt="profile_img">
+                    {% else %}
+                    <img src="{{ user.students.photo.url }}" alt="profile_img">
+                    {% endif %}
+					
+					<div class="dd_menu">
+						<div class="dd_left">
+							<ul>
+								<li><i class="fas fa-cog"></i></li>
+								<li><i class="fas fa-sign-out-alt"></i></li>
+							</ul>
+						</div>
+						<div class="dd_right">
+							<ul>
+								<li><a href="#">Settings</a></li>
+								<li><a href="{% url 'logout' %}">Logout</a></li>
+							</ul>
+						</div>
+					</div>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+</div>	
+
+<script>
+	var dd_main = document.querySelector(".dd_main");
+    var dd_main1 = document.querySelector(".dd_main1");
+
+	dd_main.addEventListener("click", function(){
+		this.classList.toggle("active");
+	})
+    dd_main1.addEventListener("click", function(){
+		this.classList.toggle("active");
+	})
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="createClass" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Create Class</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+            <form action="{% url 'create_class' %}" method="POST">
+              {% csrf_token %}
+                
+                  
+                  <input type="text" class="form-control" id="exampleInputEmail1" name='name' aria-describedby="emailHelp" placeholder="Class name">
+                  <textarea name="details" id="" class="form-control" cols="30" rows="10" placeholder="Class Details" required></textarea>
+                
+				
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+              </form>
+        </div>
+      </div>
+    </div>
+  </div>

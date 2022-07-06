@@ -12,3 +12,5 @@ def unique_code_generate(instance):
     if take_exits:
         return unique_code_generate(instance)
     return code
+
+    

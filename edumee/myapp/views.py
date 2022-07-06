@@ -126,12 +126,12 @@ class TeacherRegister(View):
             }
             
             user = User(**auth_info)
-            
+            user.is_email_verified = True
             user.is_teacher = True
             user.save()
         user_obj = Teacher(user=user, name=name)
         user_obj.save()
-        send_activation_email(user, request)
+        # send_activation_email(user, request)
         messages.success(request, 'Thanks for Signup ! Activate your account from your gmail.')
         return redirect ('index')
 
@@ -170,12 +170,12 @@ class StudentRegister(View):
             }
             
             user = User(**auth_info)
-            
+            user.is_email_verified = True
             user.is_student = True
             user.save()
             user_obj = Student(user=user, name=name)
             user_obj.save()
-        send_activation_email(user, request)
+        # send_activation_email(user, request)
         messages.success(request,'Thanks for Signup! Activate your account from your gmail.')
         return redirect ('index')
     
@@ -281,11 +281,19 @@ class TeacherDashboard(View):
         }
         return render(request,'myapp/t_dashboard.html', context)
 
+
+
+
+
+
 class StudentDashboard(View):
     @method_decorator(login_required(login_url='student_login'))
     def dispatch(self,request,*args,**kwargs):
         return super().dispatch(request,*args,**kwargs)
     def get(self,request):
         user = request.user.students
-        return render(request,'myapp/s_dashboard.html')   
+        context = {
+            'room': user.s_room.all().order_by('-id')
+        }
+        return render(request,'myapp/s_dashboard.html', context)   
     

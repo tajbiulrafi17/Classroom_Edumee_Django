@@ -17,14 +17,22 @@ class Classroom(Time):
     code = models.CharField(max_length=8, blank=True, null=True)
     details = models.TextField(max_length=100)
     teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, related_name='room')
-    student = models.ManyToManyField(Student)
+    student = models.ManyToManyField(Student, through='Membership', related_name='s_room')
 
     def __str__(self):
         return self.name
-
 
 def make_code(sender, instance, *args, **kwargs):
     if not instance.code:
         instance.code = unique_code_generate(instance)
 
 pre_save.connect(make_code, sender=Classroom)    
+
+
+class Membership(models.Model):
+    room = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
+    is_join = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{ self.room } | { self.student }"

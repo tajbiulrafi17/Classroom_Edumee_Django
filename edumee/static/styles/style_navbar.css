@@ -34,6 +34,17 @@
     
 }
 
+.navbar .nav_middle {
+	display: flex;
+	align-items: center;
+	
+}
+
+.navbar .nav_middle a{
+	color: #fff;
+
+}
+
 .navbar .nav_right {
     margin-right: 20px;
     margin-top: 5px;
@@ -71,6 +82,7 @@
     border-radius: 15px;
     box-shadow: 0px 0px 3px rgba(0,0,0,0.25);
     display: none;
+	z-index: 1;
     
 }
 
@@ -131,7 +143,7 @@
     border-radius: 15px;
     box-shadow: 0px 0px 3px rgba(0,0,0,0.25);
     display: none;
-    
+    z-index: 1;
 }
 
 .navbar .dd_menu .dd_left{
