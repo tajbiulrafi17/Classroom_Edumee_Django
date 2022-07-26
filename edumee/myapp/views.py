@@ -126,10 +126,12 @@ class TeacherRegister(View):
             }
             
             user = User(**auth_info)
+            
             user.is_email_verified = True
             user.is_teacher = True
+            user.name=name
             user.save()
-        user_obj = Teacher(user=user, name=name)
+        user_obj = Teacher(user=user)
         user_obj.save()
         # send_activation_email(user, request)
         messages.success(request, 'Thanks for Signup ! Activate your account from your gmail.')
@@ -172,8 +174,9 @@ class StudentRegister(View):
             user = User(**auth_info)
             user.is_email_verified = True
             user.is_student = True
+            user.name=name
             user.save()
-            user_obj = Student(user=user, name=name)
+            user_obj = Student(user=user)
             user_obj.save()
         # send_activation_email(user, request)
         messages.success(request,'Thanks for Signup! Activate your account from your gmail.')

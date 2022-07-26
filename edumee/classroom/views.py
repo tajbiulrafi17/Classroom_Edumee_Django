@@ -65,8 +65,6 @@ class JoinClass(View):
                 messages.success(request,'Welcome to The Class!')
                 return redirect('class_dash', id=check_code.id)
 
-
-
         except:
             messages.warning(request, "No class found! Check Class code and try again.")
             return redirect('s_dash')

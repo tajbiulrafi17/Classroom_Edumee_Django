@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'myapp',
     'classroom',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+
 ]
 
 # allauth
@@ -124,6 +128,17 @@ DATABASES = {
         'HOST' : '127.0.0.1',
         'PORT' : '3306', 
         }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticated',
+        ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
 }
 
 AUTH_USER_MODEL = 'myapp.User'

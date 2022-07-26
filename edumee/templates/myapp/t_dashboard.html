@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %} {{ user.teachers.name }} | Edumee {% endblock %}
+{% block title %} {{ user.name }} | Edumee {% endblock %}
 {% block css %}
 
 {% endblock %}
@@ -25,7 +25,7 @@
     {% for r in room %}
     <div class="col-md-3 c_box m-4 ">
             <h4>{{ r.name }}</h4>
-            <img src="{{ r.teacher.photo.url }}" alt="">
+            <img src="{{ r.teacher.user.photo.url }}" alt="">
             <span> {{ r.details }}</span><br>
             <span> Code : {{ r.code }}</span><br>
             <a href="{% url 'class_dash' r.id %}"> View Class </a>

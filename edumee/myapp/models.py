@@ -1,9 +1,13 @@
+from unicodedata import name
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
-
+from django.dispatch import receiver
 from django.contrib.auth.base_user import BaseUserManager
 
+from django.db.models.signals import post_save
+from rest_framework.authtoken.models import Token
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
@@ -34,6 +38,8 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = None
     email = models.EmailField(unique=True)
+    name = models.CharField(max_length=100, null=True, default="default")
+    photo = models.ImageField(null=True, blank=True, upload_to = 'user/', default ='profile-icon.png')
 
     password = models.CharField(max_length=100)
     confirm_password = models.CharField(max_length=100)
@@ -54,22 +60,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='teachers')
-    name = models.CharField(max_length=100, null=True)
-    photo = models.ImageField(null=True, blank=True, upload_to = 'user/', default ='profile-icon.png')
     
     def __str__(self):
         # return f"{self.user}"
-        return self.name
+        return self.user.name
 
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='students')
-    name = models.CharField(max_length=100, null=True)
-    photo = models.ImageField(null=True, blank=True, upload_to = 'user/', default = 'profile-icon.png')
     
     def __str__(self):
         #return f"{self.user}"
-        return self.name
+        return self.user.name

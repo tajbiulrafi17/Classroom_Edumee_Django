@@ -31,13 +31,8 @@
                       </div>
                     </div>
 				</li>
-				<li class="nr_li dd_main">
-                    {% if user.is_teacher %}
-                    <img src="{{ user.teachers.photo.url }}" alt="profile_img">
-                    {% else %}
-                    <img src="{{ user.students.photo.url }}" alt="profile_img">
-                    {% endif %}
-					
+				<li class="nr_li dd_main">            
+                    <img src="{{ user.photo.url }}" alt="profile_img">
 					<div class="dd_menu">
 						<div class="dd_left">
 							<ul>
