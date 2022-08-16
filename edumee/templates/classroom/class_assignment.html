@@ -1,0 +1,102 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %} Assignment | {{room.name}} {% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<script>
+{% for message in messages %}
+        
+    swal("",'{{ message }}', "success");
+
+{% endfor %}
+</script>
+
+
+<!-- <div class="col-sm-7" style="position:fixed-righ; overflow-y: scroll; height:650px;border: 3px solid #66cdaa;background-color:#e3f0e8;color:black;font-family: 'Abhaya Libre';font-size:16px;"> -->
+    <h3 align="center"; style="margin-top: 10px; margin-bottom: 20px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Assignments</h3>
+
+
+
+<div class="col-10" style="margin:0 auto;" >
+    
+    {% if user.is_teacher %}
+     
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAssignment"  style="margin-left:20px; font-size:14px" >Add Assignment</button> 
+    {% endif %}
+{% for assignment in assignments reversed %}
+        <div style="background-color:lavender; border-radius:15px;padding:10px 20px; margin:10px">
+            
+            <p> <big>{{ assignment.name }} - </big> <small>({{assignment.post_time}})</small></p>
+            Mark: {{ assignment.total_mark }}<br>
+
+            {% if assignment.due_time.timestamp > now.timestamp %}
+            <h6 style="color: green;">Due: {{ assignment.due_time }}</h6>
+            {% elif assignment.due_time.timestamp < now.timestamp %}
+            <h6 style="color: red;">Due: {{ assignment.due_time }}</h6>
+            {% endif %}
+            
+                <a href="{{ assignment.file.url }}" style="text-align:right">
+                <button type="submit" class="btn btn-success" style="font-size:14px">Download Assignment</button></a>
+                {% if user.is_teacher %}
+                <a href="{% url 'assignment_submissions' assignment.id %}">
+                    <button type="submit" class="btn btn-primary" style="font-size:14px">Submissions</button>
+                </a>
+                <a href="{% url 'assignment_marks' assignment.id %}">
+                    <button type="submit" class="btn btn-warning" style="font-size:14px">Marks</button>
+                </a>
+                {% else %}
+                <a href="{% url 'submit_assignment' assignment.id %}">
+                    <button type="submit" class="btn btn-primary" style="font-size:14px">Upload Submissions</button>
+                </a>
+                <a href="#">
+                  <button type="submit" class="btn btn-warning" style="font-size:14px">Mark</button>
+              </a>
+                <!-- for modal
+                     <a href="#">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#submissionAssignment" style="font-size:14px">Upload Submission</button>
+                </a> -->
+                {% endif %}
+                </a><br>
+            
+
+        </div>
+{% endfor %}
+</div>
+
+    </div>
+<br>
+<br> 
+
+
+<!-- Modal Submission assignment -->
+<div class="modal fade" id="submissionAssignment" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Assignment Submission</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+            <form action="{% url 'submit_assignment' 1 %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+               
+              <label for="f">Upload file:</label>
+              <input type="file" id="f" name="file" required><br>
+          
+            <button type="submit" class="btn2 btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+{% endblock %}
+

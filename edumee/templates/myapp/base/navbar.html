@@ -6,9 +6,9 @@
 			
             
             {% if user.is_teacher %}
-                <a href="{% url 't_dash' %}">Edumee</a>
+                <a href="{% url 'dash' %}">Edumee</a>
             {% else %}
-                <a href="{% url 's_dash' %}">Edumee</a>
+                <a href="{% url 'dash' %}">Edumee</a>
             {% endif %}
         
             

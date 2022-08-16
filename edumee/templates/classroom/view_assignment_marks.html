@@ -1,0 +1,39 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %} Marks | {{assignment.name}} {% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+
+
+<!-- <div class="col-sm-7" style="position:fixed-righ; overflow-y: scroll; height:650px;border: 3px solid #66cdaa;background-color:#e3f0e8;color:black;font-family: 'Abhaya Libre';font-size:16px;"> -->
+    <h3 align="center"; style="margin-top: 10px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Assignment Marks</h3>
+    <h5 align="center"; style="text-align:center;"> {{ assignment.name }}</h5>
+    <h6 align="center"; style="text-align:center;">Mark: {{ assignment.total_mark }}</h6>
+    <h6 align="center"; style=" margin-bottom: 20px;text-align:center;">Due Time: {{ assignment.due_time }}</h6>
+
+
+
+<div class="col-10" style="margin:0 auto;" >
+
+
+{% for submission in submissions reversed %}
+        <div style="background-color:lavender; border-radius:15px;padding:10px; margin:5px">
+            <h5>{{ submission.user.name }} - </h5>
+        {% if submission.get_mark is not null %}
+            <h6 style="color:darkgreen;">Obtained Mark: {{submission.get_mark}}</h6>
+        {% else %}
+        <h6 style="color:red;">Mark not assigned yet</h6>
+        {% endif %}
+        </div>
+{% endfor %}
+</div>
+
+<br>
+<br> 
+
+{% endblock %}
+

@@ -131,7 +131,7 @@ class TeacherRegister(View):
             user.is_teacher = True
             user.name=name
             user.save()
-        user_obj = Teacher(user=user)
+        user_obj = Teacher(user=user, name=name)
         user_obj.save()
         # send_activation_email(user, request)
         messages.success(request, 'Thanks for Signup ! Activate your account from your gmail.')
@@ -176,8 +176,8 @@ class StudentRegister(View):
             user.is_student = True
             user.name=name
             user.save()
-            user_obj = Student(user=user)
-            user_obj.save()
+        user_obj = Student(user=user, name=name)
+        user_obj.save()
         # send_activation_email(user, request)
         messages.success(request,'Thanks for Signup! Activate your account from your gmail.')
         return redirect ('index')
@@ -211,7 +211,7 @@ class TeacherLogin(View):
 
             if check_teacher.is_teacher == True:
                 login(request, user)
-                return redirect('t_dash')
+                return redirect('dash')
 
             elif check_teacher.is_student == False:
                 messages.warning(request, 'You are an Admin. Login from Admin Panel!')
@@ -249,7 +249,7 @@ class StudentLogin(View):
 
             if check_student.is_student == True:
                 login(request, user)
-                return redirect('s_dash')
+                return redirect('dash')
             elif check_student.is_teacher == False:
                 messages.warning(request, 'You are an Admin. Login from Admin Panel!')
                 return redirect('index')
@@ -273,30 +273,26 @@ class LogoutView(View):
 
 #Dashboard View
 
-class TeacherDashboard(View):
-    @method_decorator(login_required(login_url='teacher_login'))
+class Dashboard(View):
+    @method_decorator(login_required(login_url='index'))
     def dispatch(self,request,*args,**kwargs):
         return super().dispatch(request,*args,**kwargs)
     def get(self,request):
-        user = request.user.teachers
-        context = {
-            'room':user.room.all().order_by('-id')
-        }
-        return render(request,'myapp/t_dashboard.html', context)
+        user = request.user
 
-
-
-
-
-
-class StudentDashboard(View):
-    @method_decorator(login_required(login_url='student_login'))
-    def dispatch(self,request,*args,**kwargs):
-        return super().dispatch(request,*args,**kwargs)
-    def get(self,request):
-        user = request.user.students
+        if user.is_teacher:
+            user = request.user.teachers
+            context = {
+                'room':user.t_room.all().order_by('-id')
+            }
+            return render(request,'myapp/t_dashboard.html', context)
+        
+        elif  user.is_student:
+             user = request.user.students
         context = {
             'room': user.s_room.all().order_by('-id')
         }
-        return render(request,'myapp/s_dashboard.html', context)   
+        return render(request,'myapp/s_dashboard.html', context)
+
+
     

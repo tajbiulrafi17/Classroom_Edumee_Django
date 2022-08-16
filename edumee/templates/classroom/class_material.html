@@ -1,0 +1,51 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %} Material | {{room.name}} {% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<script>
+{% for message in messages %}
+        
+    swal("",'{{ message }}', "success");
+
+{% endfor %}
+
+</script>
+
+
+<!-- <div class="col-sm-7" style="position:fixed-righ; overflow-y: scroll; height:650px;border: 3px solid #66cdaa;background-color:#e3f0e8;color:black;font-family: 'Abhaya Libre';font-size:16px;"> -->
+    <h3 align="center"; style="margin-top: 10px;margin-bottom: 20px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Study Materials</h3>
+
+
+
+<div class="col-10" style="margin:0 auto;" >
+    
+    {% if user.is_teacher %}
+     
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMaterial"  style=" margin-left:20px" >Add Material</button> 
+    {% endif %}
+{% for material in materials reversed %}
+        <div style="background-color:lavender; border-radius:10px;padding:10px 20px; margin:10px">
+            <p> <big>{{ material.title }} - </big> <small>({{material.time}})</small></p>
+            <div style="position:right">
+                <a href="{{ material.file_resource.url }}" style="text-align:right">
+                <!-- <iframe src="assets/pdfjs/web/viewer.html?file=http://127.0.0.1:8000{{ material.file_resource.url }}" 
+          style="width:800px; height:800px;" frameborder="0"></iframe> -->
+                <button type="submit" class="btn btn-success">Download</button>
+                </a><br>
+            </div>
+
+        </div>
+{% endfor %}
+</div>
+
+    </div>
+<br>
+<br> 
+
+{% endblock %}
+

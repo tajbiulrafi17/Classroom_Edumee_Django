@@ -39,7 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = None
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100, null=True, default="default")
-    photo = models.ImageField(null=True, blank=True, upload_to = 'user/', default ='profile-icon.png')
+    photo = models.ImageField(null=True, blank=True, upload_to = 'images/user/', default ='images/profile-icon.png')
 
     password = models.CharField(max_length=100)
     confirm_password = models.CharField(max_length=100)
@@ -68,6 +68,9 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='teachers')
+    name = models.CharField(max_length=100, null=True, default="default")
+    photo = models.ImageField(null=True, blank=True, upload_to = 'images/user/', default ='images/profile-icon.png')
+    
     
     def __str__(self):
         # return f"{self.user}"
@@ -76,6 +79,8 @@ class Teacher(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='students')
+    name = models.CharField(max_length=100, null=True, default="default")
+    photo = models.ImageField(null=True, blank=True, upload_to = 'images/user/', default ='images/profile-icon.png')
     
     def __str__(self):
         #return f"{self.user}"

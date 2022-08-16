@@ -34,7 +34,7 @@
         
         <form action="{% url 'student_login' %}" class="sign-in-form" method="POST">
             {% csrf_token %}
-            <img src="{% static 'images/edumeeLogo.png' %}" class="brandname" />
+            <img src="{% static 'media/images/edumeeLogo.png' %}" class="brandname" />
             <h2 class="title">Student Sign in</h2>
           <div class="input-field">
             <i class="fas fa-user"></i>
@@ -68,7 +68,7 @@
         </form>
         <form action="{% url 'teacher_login' %}" class="sign-up-form" method="POST">
             {% csrf_token %}
-            <img src="{% static 'images/edumeeLogo.png' %}" class="brandname"  />
+            <img src="{% static 'media/images/edumeeLogo.png' %}" class="brandname"  />
             <h2 class="title">Teacher Sign in</h2>
             <div class="input-field">
               <i class="fas fa-user"></i>

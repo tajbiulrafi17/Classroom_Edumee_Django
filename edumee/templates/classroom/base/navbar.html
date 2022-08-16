@@ -2,29 +2,19 @@
 
 <div class="wrapper">
 	<div class="navbar">
-		<div class="logo">
-			
-            
-            {% if user.is_teacher %}
-                <a href="{% url 't_dash' %}">Edumee</a>
-            {% else %}
-                <a href="{% url 's_dash' %}">Edumee</a>
-            {% endif %}
-
-        
+		<div class="logo">		
+        <a href="{% url 'dash' %}">Edumee</a>
 		</div>
 
-        <div class="nav_middle">
-            
-                <a class="nav-item nav-link active" href="{% url 'class_dash' room.id %}">Stream<span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="#">Files</a>
-                <a class="nav-item nav-link" href="#">People</a>
-                
-        
-        </div>
+    <div class="nav_middle">  
+        <a class="nav-item nav-link active" href="{% url 'class_dash' room.id %}">Stream<span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="{% url 'material' room.id %}">Study Materials</a>
+        <a class="nav-item nav-link" href="{% url 'assignment' room.id %}">Assignment</a>
+        <a class="nav-item nav-link" href="{% url 'people' room.id %}">People</a>
+    </div>
 		<div class="nav_right">
 			<ul>
-                <li class="nr_li dd_main1">
+        <li class="nr_li dd_main1">
 					<i class="fas fa-bars"></i>
                     <div class="dd_menu1">
                       <div class="dd_right">
@@ -56,7 +46,7 @@
 						</div>
 					</div>
 				</li>
-				
+
 			</ul>
 		</div>
 	</div>
@@ -92,7 +82,7 @@
             {% csrf_token %}
               <div class="form-group">
                 
-                <input type="text" class="form-control" id="exampleInputEmail1" name='email' aria-describedby="emailHelp" placeholder="Enter email address here">
+                <input type="text" class="form-control" id="exampleInputEmail1" name='email' size="50" aria-describedby="emailHelp" placeholder="Separate with , or space">
                 
               </div>
               <button type="button" class="btn2 btn-secondary" data-dismiss="modal">Cancel</button>
@@ -123,7 +113,7 @@
             {% csrf_token %}
               <div class="form-group">
                 
-                <input type="password" class="form-control" id="exampleInputEmail1" name='password' aria-describedby="emailHelp" placeholder="Enter your password">
+                <input type="password" class="form-control" id="exampleInputEmail1" name='password' size="50"  aria-describedby="emailHelp" placeholder="Enter your password" >
                 
               </div>
               <button type="button" class="btn2 btn-secondary" data-dismiss="modal">Cancel</button>
@@ -153,7 +143,7 @@
               {% csrf_token %}
                 <div class="form-group">
                   
-                  <input type="password" class="form-control" id="exampleInputEmail1" name='password' aria-describedby="emailHelp" placeholder="Enter your password">
+                  <input type="password" class="form-control" id="exampleInputEmail1" name='password' size="50"  aria-describedby="emailHelp" placeholder="Enter your password">
                   
                 </div>
                 <button type="button" class="btn2 btn-secondary" data-dismiss="modal">Cancel</button>
@@ -165,3 +155,89 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal add material -->
+<div class="modal fade" id="addMaterial" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Add Study Material</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+          <form action="{% url 'add_material' room.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+              
+                
+                <input type="text" class="form-control" id="exampleInputEmail1" name='title' aria-describedby="emailHelp" placeholder="Title">
+                <label for="file">Select a file:</label>
+                <input type="file" id="file" name="file" required>
+            
+              <button type="submit" class="btn2 btn-primary">Upload</button>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+ <!-- Modal add assignment -->
+ <div class="modal fade" id="addAssignment" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Add Assignment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+          <form action="{% url 'add_assignment' room.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+              
+                
+                <input type="text" class="form-control" id="exampleInputEmail1" name='title' aria-describedby="emailHelp" placeholder="Title" required>
+                <label for="f">Select a file:</label><br>
+                <input type="file" id="f" name="file" required><br>
+                <label for="due">Mark:</label><br>
+                <input type="number" required name="mark" min="0" max="100" value="0" step=".01">
+                <label for="due">Due Time:</label><br>
+                <input type="datetime-local" id="due" name="due" required>
+            
+              <button type="submit" class="btn2 btn-primary">Upload</button>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal addmark assignment -->
+<div class="modal fade" id="addmarkAssignment" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Add Assignment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+          <form action="{% url 'addmark_assignment' 1 %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+              
+
+                <label for="">Mark:</label><br>
+                <input type="number" name="mark" min="0" max="100" value="0" step=".01"  required>
+                
+              <button type="submit" class="btn2 btn-primary">Upload</button>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>

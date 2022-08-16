@@ -11,7 +11,6 @@ from .permissions import IsStudentUser, IsTeacherUser
 
 class TeacherSignupView(generics.GenericAPIView):
     serializer_class=TeacherSignupSerializer
-
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

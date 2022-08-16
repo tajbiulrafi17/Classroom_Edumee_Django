@@ -54,10 +54,10 @@ class UserSerializer(serializers.ModelSerializer):
     
 
 class TeacherSignupSerializer(serializers.ModelSerializer):
-    password2=serializers.CharField(style={"input_type":"password"}, write_only=True)
+    confirm_password=serializers.CharField(style={"input_type":"password"}, write_only=True)
     class Meta:
         model=User
-        fields=['email', 'name', 'password', 'password2']
+        fields=['email', 'name', 'password', 'confirm_password']
         extra_kwargs={
             'password':{'write_only':True}
         }
@@ -69,7 +69,7 @@ class TeacherSignupSerializer(serializers.ModelSerializer):
         )
         
         password=self.validated_data['password']
-        password2=self.validated_data['password2']
+        password2=self.validated_data['confirm_password']
         if password != password2:
             raise serializers.ValidationError({"error":"Password did not match"})
         user.set_password(password)
@@ -80,10 +80,10 @@ class TeacherSignupSerializer(serializers.ModelSerializer):
         return user
 
 class StudentSignupSerializer(serializers.ModelSerializer):
-    password2=serializers.CharField(style={"input_type":"password"}, write_only=True)
+    confirm_password=serializers.CharField(style={"input_type":"password"}, write_only=True)
     class Meta:
         model=User
-        fields=['email', 'name', 'password', 'password2']
+        fields=['email', 'name', 'password', 'confirm_password']
         extra_kwargs={
             'password':{'write_only':True}
         }
@@ -94,7 +94,7 @@ class StudentSignupSerializer(serializers.ModelSerializer):
             name=self.validated_data['name']
         )
         password=self.validated_data['password']
-        password2=self.validated_data['password2']
+        password2=self.validated_data['confirm_password']
         if password != password2:
             raise serializers.ValidationError({"error":"Password did not match"})
         user.set_password(password)

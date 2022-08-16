@@ -1,0 +1,57 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %} Submissions | {{assignment.name}} {% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<script>
+    {% for message in messages %}  
+        swal("",'{{ message }}', "success");
+{% endfor %}
+</script>
+
+<!-- <div class="col-sm-7" style="position:fixed-righ; overflow-y: scroll; height:650px;border: 3px solid #66cdaa;background-color:#e3f0e8;color:black;font-family: 'Abhaya Libre';font-size:16px;"> -->
+    <h3 align="center"; style="margin-top: 10px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Submissions</h3>
+    <h5 align="center"; style="text-align:center;"> {{ assignment.name }}</h5>
+    <h6 align="center"; style="text-align:center;">Mark: {{ assignment.total_mark }}</h6>
+    <h6 align="center"; style=" margin-bottom: 20px;text-align:center;">Due Time: {{ assignment.due_time }}</h6>
+
+
+
+<div class="col-10" style="margin:0 auto;" >
+
+{% for submission in submissions reversed %}
+        <div style="background-color:lavender; border-radius:15px;padding:10px 20px; margin:5px">
+            <h5>{{ submission.user.name }} - </h5>
+            <a href="{{ submission.file.url }}" style="text-align:right"> {{ submission.file.name }}</a> <br>
+            <p>Submission Time: {{ submission.time }}
+        {% if assignment.due_time < submission.time %}
+            <i style="color: red;">(Late Submission)</i> 
+        {% endif %}</p>
+        {% if submission.get_mark is not null %}
+            <h6 style="color:rgb(2, 165, 2);">Obtained Mark: {{submission.get_mark}}</h6>
+            <a href="{% url 'addmark_assignment' submission.id %}">
+                <button type="submit" class="btn btn-success" style="font-size:14px">Update Mark</button>
+            </a> 
+        {% else %}
+        <h6 style="color:red;">Mark not Assigned</h6>
+        <a href="{% url 'addmark_assignment' submission.id %}">
+            <button type="submit" class="btn btn-success" style="font-size:14px">Assign Mark</button>
+        </a>          
+            <!-- for modal
+                <a href="#">
+                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#addmarkAssignment" style="font-size:14px">Assign Mark</button>
+            </a> -->
+        {% endif %}
+        </div>
+{% endfor %}
+</div>
+
+<br>
+<br> 
+
+{% endblock %}
+

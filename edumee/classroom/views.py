@@ -1,15 +1,22 @@
-import imp
+
+from datetime import datetime
 from json import load
 from operator import methodcaller
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from .models import Classroom, Membership
+from .models import Assignment, Classroom, Membership, Notification, StudyMaterials, SubmissionAssignment
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.mail import send_mail
+import re
+from django.http import FileResponse
+import os
+ 
+
+
 
 # Create your views here.
 
@@ -20,8 +27,12 @@ class ClassDashboard(View):
 
     def get(self,request, id):
         room = get_object_or_404(Classroom, id=id)
+        notification = Notification.objects.filter(course=room)
+        now = datetime.now()
         context = {
             'room':room,
+            'notification':notification,
+            'now':now
         }
         return render(request, 'classroom/class_dashboard.html', context)
 
@@ -120,13 +131,212 @@ class InviteClass(View):
         try: 
             room = get_object_or_404(Classroom, id=id)
             send_to = request.POST.get('email')
+            recipient_list = re.split(" , | ,|, |,| ", send_to)
             subject = 'Edumee Classroom Invitation'
             message = f'Hi Student, Greetings!!\nPlease join into class {room.name}, using class code: {room.code}.\nYour Teacher: {room.teacher}\n\nThank you,\nEdumee.'
             email_from = settings.EMAIL_HOST_USER
-            recipient_list = [send_to]
+            
             send_mail(subject, message, email_from, recipient_list)
             messages.success(request, 'Invitation successful!')
             return redirect('class_dash', id=id)
         except:
             messages.warning(request, 'Something wrong! Invitation failed!')
             return redirect('class_dash', id=id)
+
+
+class RoomPeople(View):
+    @method_decorator(login_required(login_url='student_login'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, id):
+        room = get_object_or_404(Classroom, id=id)
+        students = room.student.all().order_by('name')
+        teacher = room.teacher
+        context = {
+            't':teacher,
+            'room': room,
+            's': students
+        }
+        return render(request, 'classroom/class_people.html', context)
+
+class AddMaterial(View):
+    @method_decorator(login_required(login_url='teacher_login'))
+    def dispatch(self,request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self,request, id):
+        title = request.POST.get('title')
+        file = request.FILES.get('file')
+        room = get_object_or_404(Classroom, id=id)
+        material = StudyMaterials(title=title, file_resource=file, classroom=room)
+        material.save()
+        noti = Notification()
+        noti.title = " - New Material Uploaded - "
+        noti.material = material
+        noti.course = room
+        noti.save()
+        messages.success(request, 'Study Material added !!')
+        return redirect('material', id=room.id)
+
+
+
+
+@login_required
+def view_materials(request, id):
+    classroom = Classroom.objects.get(id=id)
+    materials = StudyMaterials.objects.filter(classroom=classroom)
+    context = {
+        'room' : classroom,
+        'materials' : materials,
+    }
+    return render(request,'classroom/class_material.html',context)
+
+
+class AddAssignment(View):
+    @method_decorator(login_required(login_url='teacher_login'))
+    def dispatch(self,request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self,request, id):
+        title = request.POST.get('title')
+        file = request.FILES.get('file')
+        due = request.POST.get('due')
+        mark = request.POST.get('mark')
+        room = get_object_or_404(Classroom, id=id)
+        assignment = Assignment(name=title, file=file, course=room, due_time=due, total_mark=mark)
+        assignment.save()
+        noti = Notification()
+        noti.title = " - New Assignment Uploaded - "
+        noti.assignment = assignment
+        noti.course = room
+        noti.save()
+        messages.success(request, 'Assignment added !!')
+        return redirect('assignment', id=room.id)
+
+
+
+@login_required
+def view_assignments(request, id):
+    classroom = Classroom.objects.get(id=id)
+    assignments = Assignment.objects.filter(course=classroom)
+    now = datetime.now()
+    context = {
+        'room' : classroom,
+        'assignments' : assignments,
+        'now':now
+    }
+    return render(request,'classroom/class_assignment.html',context)
+
+
+# for modal
+# class AssignmentSubmission(View):
+#     @method_decorator(login_required(login_url='teacher_login'))
+#     def dispatch(self,request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs)
+
+#     def post(self,request, id):
+#         file = request.FILES.get('file')
+#         assignment = Assignment.objects.get(id=id)
+#         course_id = assignment.course.id
+#         room = Classroom.objects.get(id=course_id)
+#         user = request.user.students
+#         room = assignment.course
+#         submission = SubmissionAssignment( file=file, user=user , assignment=assignment)
+#         submission.save()
+#         messages.success(request, 'Submit Successful !!')
+        
+#         return redirect('assignment', id=room.id)
+
+class AssignmentSubmission(View):
+    
+    def get(self, request, id):
+        assignment = Assignment.objects.get(id=id)
+        course_id = assignment.course.id
+        room = Classroom.objects.get(id=course_id)
+        context={
+            'assignment':assignment,
+            'room':room
+        }
+        return render(request, 'classroom/upload_submission.html', context)
+
+    def post(self,request, id):
+        file = request.FILES.get('file')
+        assignment = Assignment.objects.get(id=id)
+        course_id = assignment.course.id
+        room = Classroom.objects.get(id=course_id)
+        user = request.user.students
+        room = assignment.course
+        submission = SubmissionAssignment( file=file, user=user , assignment=assignment)
+        submission.save()
+        messages.success(request, 'Submit Successful !!')
+        
+        return redirect('assignment', id=room.id)
+
+@login_required
+def view_assignmentSubmissions(request, id):
+    assignment = Assignment.objects.get(id=id)
+    submissions = SubmissionAssignment.objects.filter(assignment=assignment)
+    course_id = assignment.course.id
+    room = Classroom.objects.get(id=course_id)
+    context = {
+        'assignment' : assignment,
+        'submissions' : submissions,
+        'room': room
+    }
+    return render(request,'classroom/view_submissions.html',context)
+
+# for modal
+# class AddMarkAssignment(View):
+#     @method_decorator(login_required(login_url='teacher_login'))
+#     def dispatch(self,request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs)
+
+#     def post(self,request, id):
+#         mark = request.POST.get('mark')
+#         submission = get_object_or_404(SubmissionAssignment, id=id)
+#         submission.get_mark = mark
+#         submission.save()
+#         assignment_id = submission.assignment.id
+#         assignment = Assignment.objects.filter(id=assignment_id)
+#         messages.success(request, 'Mark Assigned !!')
+#         return redirect('assignment_submissions', id=assignment_id)
+
+class AddMarkAssignment(View):
+
+    def get(self, request, id):
+        submission = SubmissionAssignment.objects.get(id=id)
+        assignment= submission.assignment
+        user = submission.user
+        course_id = assignment.course.id
+        room = Classroom.objects.get(id=course_id)
+        context={
+            'submission':submission,
+            'assignment':assignment,
+            'user':user,
+            'room':room
+        }
+        return render(request, 'classroom/assign_mark.html', context)
+
+    def post(self,request, id):
+        mark = request.POST.get('mark')
+        submission = get_object_or_404(SubmissionAssignment, id=id)
+        submission.get_mark = mark
+        submission.save()
+        assignment_id = submission.assignment.id
+        messages.success(request, 'Mark Assigned !!')
+        return redirect('assignment_submissions', id=assignment_id)
+
+
+@login_required
+def view_assignmentMarks(request, id):
+    assignment = Assignment.objects.get(id=id)
+    submissions = SubmissionAssignment.objects.filter(assignment=assignment)
+    course_id = assignment.course.id
+    room = Classroom.objects.get(id=course_id)
+    context = {
+        'assignment' : assignment,
+        'submissions' : submissions,
+        'room': room
+    }
+    return render(request,'classroom/view_assignment_marks.html',context)

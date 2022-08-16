@@ -1,0 +1,57 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %} People | {{room.name}} {% endblock %}
+
+{% block css %}
+
+.main_box{
+    border-radius:20px;
+    background: rgb(63,94,251);
+    background: linear-gradient(41deg, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+    padding:30px 100px;
+}
+
+.box{
+    border-radius:20px;
+    
+    background: #8eccff;
+    padding:10px 100px;
+    margin-bottom:5px auto;
+}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row  mt-3">
+            <div class="col-10 main_box" style="margin:0 auto;" >
+                    <h2 style="color:white;">{{ room.name }}</h2>
+                    <p>{{ room.details }}</p>
+                    <h5 >Code : {{ room.code }}</h5>
+            </div>
+        
+    </div>
+<h4 align="center" style="margin-top:30px">Teacher</h4>
+<div class="col-10" style="margin:0 auto;">
+    <div style="background-color:lavender; border-radius:10px;padding:10px; margin:5px">
+        <div style="position:right">   
+            <p> <big>{{ t.name }} - </big> <small>(Gmail: {{t.user.email}})</small></p>
+        </div>    
+    </div>
+</div>
+
+<h4 align="center" style="margin-top:30px">Students</h4>
+<div class="col-10" style="margin:0 auto;" >
+
+    {% for s in s %}
+    <div style="background-color:lavender; border-radius:10px;padding:10px; margin:5px">
+        <div style="position:right">
+           <p> <big>{{ s.name }} - </big> <small>(Gmail: {{s.user.email}})</small></p>
+        </div>
+    </div>
+        
+        {% endfor %}
+</div>
+<br>
+<br> 
+{% endblock %}
