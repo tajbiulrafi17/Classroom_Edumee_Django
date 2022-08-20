@@ -1,0 +1,75 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %} Announcement | {{room.name}} {% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<script>
+
+{% for message in messages %}
+        
+    swal("",'{{ message }}', "success");
+
+{% endfor %}
+</script>
+
+
+<!-- <div class="col-sm-7" style="position:fixed-righ; overflow-y: scroll; height:650px;border: 3px solid #66cdaa;background-color:#e3f0e8;color:black;font-family: 'Abhaya Libre';font-size:16px;"> -->
+    <h3 align="center"; style="margin-top: 10px; margin-bottom: 5px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Announcement</h3>
+    <h5 align="center"; style="text-align:center;"> {{ room.name }}</h5>
+
+
+
+<div class="col-10" style="margin:0 auto;" >
+    
+    {% if user.is_teacher %}
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAnnouncement"  style="margin-left:20px; font-size:14px" >Post Announcement</button> 
+    {% endif %}
+{% for announcement in announcements reversed %}
+        <div style="background-color:lavender; border-radius:15px;padding:10px 20px; margin:10px">
+            
+            <p> <big style="color:dodgerblue;">{{ announcement.title }} - </big> <small>({{announcement.time}})</small></p>
+            {{ announcement.details }}
+
+            
+        </div>
+{% endfor %}
+</div>
+
+    </div>
+<br>
+<br> 
+
+
+<!-- Modal Submission assignment -->
+<div class="modal fade" id="addAnnouncement" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">New Announcement</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+            <form action="{% url 'add_announcement' room.id %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+               
+            <input type="text" class="form-control" id="exampleInputEmail1" name='title' aria-describedby="emailHelp" placeholder="Title">
+            <textarea name="details" id="" class="form-control" cols="30" rows="10" placeholder="Description" required></textarea>
+                
+          
+            <button type="submit" class="btn2 btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+{% endblock %}
+

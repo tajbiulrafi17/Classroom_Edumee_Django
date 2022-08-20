@@ -1,0 +1,165 @@
+{% extends 'classroom/base/base.html' %}
+
+{% block title %}Discussion | {{ rooms.name }}{% endblock %}
+
+{% block css %}
+<style>
+
+    
+    .container {
+
+      background-color:lavender;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    
+    .darker {
+      border-color: #ccc;
+      background-color:white;
+    }
+    
+    .container::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+    
+    .container img {
+      float: left;
+      max-width: 60px;
+      width: 100%;
+      margin-right: 20px;
+      border-radius: 50%;
+    }
+    
+    .container img.right {
+      float: right;
+      margin-left: 20px;
+      margin-right:0;
+    }
+    
+    .time-right {
+      float: right;
+      color: #aaa;
+    }
+    
+    .time-left {
+      float: left;
+      color: #999;
+    }
+
+    .inp{
+        width: 300px;
+        height: 50px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<h3 align="center"; style="margin-top: 10px; margin-bottom: 0px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Discussion</h3>
+<h3 align="center"; style="margin-top: 0px; margin-bottom: 30px;text-align:center;font-family:Volkhov,cursive;font-size:20px;color: #4a4c4d">{{ rooms.name }}</h3>
+
+
+<div id="chatbox" style="margin: 0 auto;margin-bottom: 50px; max-width: 600px; padding: 10px 15px; background-color:lavender; border-radius:15px;">
+
+    <div class="container" id="chat-messages">
+        {% for m in messages %}
+        <div class="container darker">
+        <b>{{ m.user.name }}</b>
+        <p>{{ m.content }}</p>
+        <span style="color:#999 ;"> ({{ m.time }})</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <form method="post" action="." class="flex">
+        
+        <label for="chat-message-input">{{request.user.name}}</label>
+        <input type="text" name="content" class="inp" id="chat-message-input" placeholder="Your message..." required />
+        <button class="btn btn-success" id="chat-message-submit" >Submit</button>
+    </form>
+
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+{{ rooms.slug|json_script:"json-roomname" }}
+{{ request.user.name|json_script:"json-username" }}
+
+<script>
+    const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
+    const userName = JSON.parse(document.getElementById('json-username').textContent);
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + roomName
+        + '/'
+    );
+
+    chatSocket.onclose = function(e) {
+        console.log('onclose')
+    }
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        if (data.message) {
+            document.querySelector('#chat-messages').innerHTML += ('<div class="container darker"><b>'+ data.username +'</b><p>' + data.message + '</p><span style="color:#999 ;"> (' + data.time + ')</span></div>');
+        } else {
+            alert('The message was empty!')
+        }
+        scrollToBottom();
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        e.preventDefault()
+
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+
+        console.log({
+            'message': message,
+            'username': userName,
+            'room': roomName
+        })
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'username': userName,
+            'room': roomName
+        }));
+
+        messageInputDom.value = '';
+
+        return false
+    };
+    
+    function scrollToBottom() {
+        let objDiv = document.getElementById("chat-messages");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+    // Add this below the function to trigger the scroll on load.
+    scrollToBottom();
+
+</script>
+{% endblock %}

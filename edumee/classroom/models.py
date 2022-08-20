@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from myapp.models import Teacher, Student
+from myapp.models import Teacher, Student, User
 from .utils import unique_code_generate
 from django.db.models.signals import pre_save
 
@@ -64,7 +64,16 @@ class SubmissionAssignment(models.Model):
     user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return f"{ self.assignment.course } |{ self.assignment.name } | { self.user }"
 
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=150)
+    details = models.CharField(max_length=1000)
+    time = models.DateTimeField(auto_now_add = True)
+    course = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
+    
 
 class Notification(models.Model):
     title = models.CharField(max_length=100)
@@ -72,6 +81,24 @@ class Notification(models.Model):
     course = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
     material = models.ForeignKey(StudyMaterials, on_delete=models.CASCADE, null=True)
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, null=True)
-    
+    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, null=True)
+
+
+class DiscussionRoom(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(unique=True)
+    course = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
+
+class Message(models.Model):
+    room = models.ForeignKey(DiscussionRoom, related_name='messages', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('time',)
+
+
+
 
 

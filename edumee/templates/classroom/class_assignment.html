@@ -8,6 +8,7 @@
 
 {% block content %}
 <script>
+
 {% for message in messages %}
         
     swal("",'{{ message }}', "success");
@@ -17,33 +18,43 @@
 
 
 <!-- <div class="col-sm-7" style="position:fixed-righ; overflow-y: scroll; height:650px;border: 3px solid #66cdaa;background-color:#e3f0e8;color:black;font-family: 'Abhaya Libre';font-size:16px;"> -->
-    <h3 align="center"; style="margin-top: 10px; margin-bottom: 20px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Assignments</h3>
+    <h3 align="center"; style="margin-top: 10px; margin-bottom: 10px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Assignments</h3>
+    <h3 align="center"; style="margin-top: 0px; margin-bottom: 30px;text-align:center;font-family:Volkhov,cursive;font-size:20px;color: #4a4c4d">{{ room.name }}</h3>
 
 
 
-<div class="col-10" style="margin:0 auto;" >
+<div class="col-8" style="margin:0 auto;" >
     
     {% if user.is_teacher %}
-     
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAssignment"  style="margin-left:20px; font-size:14px" >Add Assignment</button> 
     {% endif %}
 {% for assignment in assignments reversed %}
         <div style="background-color:lavender; border-radius:15px;padding:10px 20px; margin:10px">
             
-            <p> <big>{{ assignment.name }} - </big> <small>({{assignment.post_time}})</small></p>
-            Mark: {{ assignment.total_mark }}<br>
-
+            <h5> <big style="color:dodgerblue;">{{ assignment.name }} - </big> <small>({{assignment.post_time}})</small></h5>
+            Total Mark: {{ assignment.total_mark }}<br>
+            {% for submission in submissions reversed %}
+                {% if submission.assignment == assignment and submission.user == request.user.students %}
+               
+                  {% if submission.get_mark is none %}
+                  Obtained Mark: Not Assigned<br>
+                  {% else %}
+                  Obtained Mark: {{ submission.get_mark }}<br>
+                  {% endif %}
+                  [Submitted]<br>
+                {% endif %}
+            {% endfor %}
             {% if assignment.due_time.timestamp > now.timestamp %}
-            <h6 style="color: green;">Due: {{ assignment.due_time }}</h6>
+            <h6 style="color: green;">Due: {{ assignment.due_time }} </h6>
             {% elif assignment.due_time.timestamp < now.timestamp %}
-            <h6 style="color: red;">Due: {{ assignment.due_time }}</h6>
+            <h6 style="color: red;">Due: {{ assignment.due_time }} </h6>
             {% endif %}
             
                 <a href="{{ assignment.file.url }}" style="text-align:right">
                 <button type="submit" class="btn btn-success" style="font-size:14px">Download Assignment</button></a>
                 {% if user.is_teacher %}
                 <a href="{% url 'assignment_submissions' assignment.id %}">
-                    <button type="submit" class="btn btn-primary" style="font-size:14px">Submissions</button>
+                    <button type="submit" class="btn btn-primary" style="font-size:14px">All Submissions</button>
                 </a>
                 <a href="{% url 'assignment_marks' assignment.id %}">
                     <button type="submit" class="btn btn-warning" style="font-size:14px">Marks</button>

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'myapp',
     'classroom',
+    'channels',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -109,6 +110,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'edumee.wsgi.application'
+ASGI_APPLICATION = 'edumee.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
+
 
 
 # Database

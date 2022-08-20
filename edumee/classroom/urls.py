@@ -24,6 +24,13 @@ urlpatterns =[
     path('addmark_assignment/<int:id>/', views.AddMarkAssignment.as_view(), name='addmark_assignment'),
     path('<int:id>/assignment_marks/', views.view_assignmentMarks, name='assignment_marks'),
 
+    path('<int:id>/announcement/', views.view_announcements, name='announcement'),
+    path('add_announcement/<int:id>/', views.AddAnnouncement.as_view(), name='add_announcement'),
+
+    path('discussions/<int:id>/', views.discussions, name='discussions'),
+
+    path('<int:id>/pdf/', views.show_pdf, name='pdfview'),
+
 
 
 

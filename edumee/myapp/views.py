@@ -172,13 +172,13 @@ class StudentRegister(View):
             }
             
             user = User(**auth_info)
-            user.is_email_verified = True
+            user.is_email_verified = False
             user.is_student = True
             user.name=name
             user.save()
         user_obj = Student(user=user, name=name)
         user_obj.save()
-        # send_activation_email(user, request)
+        send_activation_email(user, request)
         messages.success(request,'Thanks for Signup! Activate your account from your gmail.')
         return redirect ('index')
     

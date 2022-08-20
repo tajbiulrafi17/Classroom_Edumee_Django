@@ -18,7 +18,7 @@
 </script>
 
     <div class="row  mt-2 ">
-            <div class="col-10 main_box" style="margin:0 auto; padding-left:30px" >
+            <div class="col-9 main_box" style="margin:0 auto; padding-left:30px" >
                     <h2 style="color:white;">{{ room.name }}</h2>
                     <h6>{{ room.details }}</h6>
                     <h6> Teacher: {{ room.teacher.name }}</h6>
@@ -30,34 +30,52 @@
     </div>
 
 
+    <h3 align="center"; style="margin-top: 10px; margin-bottom: 10px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">
+        <a href="{% url 'announcement' room.id %}">
+        <button type="submit" class="btn btn-primary" style="font-size:14px">Announcement</button>
+        </a>
+        <a href="{% url 'discussions' room.id %}">
+        <button type="submit" class="btn btn-primary" style="font-size:14px">Discussion</button>
+        </a>
+     </h3>
 
-<h3 align="center"; style="margin-top: 10px; margin-bottom: 20px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Stream</h3>
+    <h3 align="center"; style="margin-top: 10px; margin-bottom: 20px;text-align:center;font-family:Volkhov,cursive;font-size:30px;color: #4a4c4d">Stream</h3>
 
 
 
-<div class="col-10" style="margin:0 auto;" >
+
+<div class="col-8" style="margin:0 auto;" >
+
+    
     
 
 {% for noti in notification reversed %}
 
-        {% if noti.material is not none %}
+        {% if noti.assignment is null  and noti.announcement is null %}
         <div style="background-color:lavender; border-radius:15px;padding:10px; margin:10px; padding-left:25px">
             <p> <big style="color:dodgerblue;">{{ noti.title }} </big> <small>({{noti.time}})</small></p>
             {{ noti.material.title }}
 
         </div>
-        {% elif noti.assignment is not none %}
+        {% elif  noti.material is null  and noti.announcement is null %}
         <div style="background-color:lavender; border-radius:15px;padding:10px; margin:10px; padding-left:25px">
             <p> <big style="color:dodgerblue;">{{ noti.title }} </big> <small>({{noti.time}})</small></p>
 
             <h5>{{ noti.assignment.name }} </h5>
             <h6>Mark: {{noti.assignment.total_mark}}</h6> 
+            
             {% if noti.assignment.due_time.timestamp > now.timestamp %}
             <h6 style="color: green;">Due: {{ noti.assignment.due_time }}</h6>
             {% elif noti.assignment.due_time.timestamp < now.timestamp %}
             <h6 style="color: red;">Due: {{ noti.assignment.due_time }}</h6>
             {% endif %}
 
+        </div>
+        {% elif  noti.material is null  and noti.assignment is null %}
+        <div style="background-color:lavender; border-radius:15px;padding:10px; margin:10px; padding-left:25px">
+            <p> <big style="color:dodgerblue;">{{ noti.title }} </big> <small>({{noti.time}})</small></p>
+            {{ noti.announcement.title }}<br>
+            {{ noti.announcement.details }}
         </div>
         {% endif %}
 {% endfor %}

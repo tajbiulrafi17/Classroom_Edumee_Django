@@ -30,7 +30,7 @@
                     </div>
 				</li>
 				<li class="nr_li dd_main">
-                    <img src="{{ user.photo.url }}" alt="profile_img">       
+                    <img src="{{ user.photo.url }}" alt="img">       
 					<div class="dd_menu">
 						<div class="dd_left">
 							<ul>
@@ -201,11 +201,11 @@
               
                 
                 <input type="text" class="form-control" id="exampleInputEmail1" name='title' aria-describedby="emailHelp" placeholder="Title" required>
-                <label for="f">Select a file:</label><br>
-                <input type="file" id="f" name="file" required><br>
-                <label for="due">Mark:</label><br>
+                <label for="f">Select a file:</label>
+                <input type="file" id="f" name="file" required>
+                <label for="due">Mark:</label>
                 <input type="number" required name="mark" min="0" max="100" value="0" step=".01">
-                <label for="due">Due Time:</label><br>
+                <label for="due">Due Time:</label>
                 <input type="datetime-local" id="due" name="due" required>
             
               <button type="submit" class="btn2 btn-primary">Upload</button>
@@ -233,7 +233,7 @@
               
 
                 <label for="">Mark:</label><br>
-                <input type="number" name="mark" min="0" max="100" value="0" step=".01"  required>
+                <input type="number" name="mark" min="0" max="100" value="0" step=".01"   required>
                 
               <button type="submit" class="btn2 btn-primary">Upload</button>
             </form>

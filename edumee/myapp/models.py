@@ -8,6 +8,8 @@ from django.contrib.auth.base_user import BaseUserManager
 
 from django.db.models.signals import post_save
 from rest_framework.authtoken.models import Token
+
+
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):

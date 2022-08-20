@@ -2,11 +2,12 @@
 from datetime import datetime
 from json import load
 from operator import methodcaller
+from xmlrpc.client import boolean
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from .models import Assignment, Classroom, Membership, Notification, StudyMaterials, SubmissionAssignment
+from .models import Announcement, Assignment, Classroom, Membership, Message, Notification, StudyMaterials, SubmissionAssignment, DiscussionRoom
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.conf import settings
@@ -14,8 +15,7 @@ from django.core.mail import send_mail
 import re
 from django.http import FileResponse
 import os
- 
-
+from django.http import HttpResponse, JsonResponse, FileResponse
 
 
 # Create your views here.
@@ -51,6 +51,8 @@ class CreateClass(View):
         user = request.user.teachers
         room = Classroom(teacher=user, name=name, details=details)
         room.save()
+        discussionRoom = DiscussionRoom(name=name, slug=name, course=room)
+        discussionRoom.save()
         messages.success(request, 'Classroom has been Created !!')
         return redirect('class_dash', id=room.id)
 
@@ -68,7 +70,7 @@ class JoinClass(View):
             check = Membership.objects.filter(room=classroom, student=user)
             if check:
                 messages.success(request,'You are Already a member')
-                return redirect('s_dash') 
+                return redirect('dash') 
             else:
                 member = Membership(room=classroom, student = user)
                 member.is_join = True
@@ -78,7 +80,7 @@ class JoinClass(View):
 
         except:
             messages.warning(request, "No class found! Check Class code and try again.")
-            return redirect('s_dash')
+            return redirect('dash')
 
 
 class LeaveClass(View):
@@ -97,7 +99,7 @@ class LeaveClass(View):
             membership = Membership.objects.filter(student=user, room=room)
             membership.delete()
             messages.warning(request, 'You left the Classroom')
-            return redirect('s_dash')
+            return redirect('dash')
         else:
             messages.warning(request, 'Verification failed! Could not leave.')
             return redirect('view_class', id=id)
@@ -116,7 +118,7 @@ class DeleteClass(View):
             room = get_object_or_404(Classroom, id=id)
             room.delete()
             messages.warning(request, 'You deleted the Classroom')
-            return redirect('t_dash')
+            return redirect('dash')
         else:
             messages.warning(request, 'Verification failed! Could not delete.')
             return redirect('view_class', id=id)
@@ -220,11 +222,14 @@ class AddAssignment(View):
 def view_assignments(request, id):
     classroom = Classroom.objects.get(id=id)
     assignments = Assignment.objects.filter(course=classroom)
+    submissions = SubmissionAssignment.objects.all()
     now = datetime.now()
     context = {
         'room' : classroom,
         'assignments' : assignments,
-        'now':now
+        'now':now,
+        'submissions':submissions,
+
     }
     return render(request,'classroom/class_assignment.html',context)
 
@@ -249,7 +254,6 @@ def view_assignments(request, id):
 #         return redirect('assignment', id=room.id)
 
 class AssignmentSubmission(View):
-    
     def get(self, request, id):
         assignment = Assignment.objects.get(id=id)
         course_id = assignment.course.id
@@ -270,7 +274,6 @@ class AssignmentSubmission(View):
         submission = SubmissionAssignment( file=file, user=user , assignment=assignment)
         submission.save()
         messages.success(request, 'Submit Successful !!')
-        
         return redirect('assignment', id=room.id)
 
 @login_required
@@ -340,3 +343,69 @@ def view_assignmentMarks(request, id):
         'room': room
     }
     return render(request,'classroom/view_assignment_marks.html',context)
+
+
+class AddAnnouncement(View):
+    @method_decorator(login_required(login_url='teacher_login'))
+    def dispatch(self,request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self,request, id):
+        title = request.POST.get('title')
+        details = request.POST.get('details')
+        room = get_object_or_404(Classroom, id=id)
+        announcement = Announcement(title=title, details=details, course=room)
+        announcement.save()
+        noti = Notification()
+        noti.title = " - New Announcement - "
+        noti.announcement = announcement
+        noti.course = room
+        noti.save()
+        messages.success(request, 'Announcement posted !!')
+        return redirect('announcement', id=room.id)
+
+
+
+@login_required
+def view_announcements(request, id):
+    classroom = Classroom.objects.get(id=id)
+    announcements = Announcement.objects.filter(course=classroom)
+    context = {
+        'room' : classroom,
+        'announcements' : announcements,
+    }
+    return render(request,'classroom/view_announcement.html',context)
+
+
+
+# Discussion
+
+@login_required
+def discussions(request, id):
+    room = Classroom.objects.get(id=id)
+    rooms = DiscussionRoom.objects.get(course=room)
+    messages = Message.objects.filter(room=rooms)
+    
+    context = {
+        'rooms': rooms,
+        'messages': messages,
+        'room':room
+
+    }
+    return render(request, 'classroom/view_discussion.html', context)
+
+
+
+
+def show_pdf(request, id):
+    file = StudyMaterials.objects.get(id=id)
+    f = file.file_resource.url
+    filepath = os.path.join('static', f)
+    return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+    # 'static/media/files/Leture_1.pdf'
+
+
+
+
+
+
