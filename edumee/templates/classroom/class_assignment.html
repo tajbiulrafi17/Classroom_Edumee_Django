@@ -44,6 +44,7 @@
                   [Submitted]<br>
                 {% endif %}
             {% endfor %}
+            
             {% if assignment.due_time.timestamp > now.timestamp %}
             <h6 style="color: green;">Due: {{ assignment.due_time }} </h6>
             {% elif assignment.due_time.timestamp < now.timestamp %}

@@ -24,7 +24,6 @@
             <form action="{% url 'addmark_assignment' submission.id %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                   
-    
                     <label for="">Mark:</label><br>
                     <input type="number" name="mark" min="0" max="100" value="0" step=".01"  required>
                     
